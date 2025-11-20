@@ -74,7 +74,7 @@ export const FocusView: React.FC<FocusViewProps> = ({ tasks, onFinishDay, onEdit
   };
 
   return (
-    <div className="h-[100dvh] w-full flex flex-col bg-neo-white relative overflow-hidden">
+    <div className="h-[100dvh] w-full flex flex-col bg-neo-white relative overflow-hidden pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       
       {/* Top Bar */}
       <div className="flex justify-between items-center p-4 z-10">
@@ -85,13 +85,13 @@ export const FocusView: React.FC<FocusViewProps> = ({ tasks, onFinishDay, onEdit
       </div>
 
       {/* Center Content */}
-      <div className="flex-1 flex flex-col items-center justify-center p-6">
+      <div className="flex-1 flex flex-col items-center justify-center p-6 w-full">
         {currentTask ? (
-          <div className="w-full max-w-md relative">
+          <div className="w-full max-w-md relative mt-4">
              {/* Progress Bar (Background) */}
-             <div className="absolute -top-6 left-0 w-full h-4 bg-gray-200 border-2 border-neo-black rounded-full overflow-hidden">
+             <div className="absolute -top-8 left-0 w-full h-4 bg-gray-200 border-2 border-neo-black rounded-full overflow-hidden shadow-neo-sm">
                 <div 
-                  className="h-full bg-neo-black transition-all duration-1000"
+                  className="h-full bg-neo-black transition-all duration-1000 ease-linear"
                   style={{ width: `${getProgress()}%` }}
                 />
              </div>
@@ -100,11 +100,11 @@ export const FocusView: React.FC<FocusViewProps> = ({ tasks, onFinishDay, onEdit
               color={currentTask.color} 
               className="aspect-[4/5] flex flex-col items-center justify-center text-center gap-6 border-4 shadow-neo-lg animate-in zoom-in duration-300"
             >
-              <div className="space-y-2">
+              <div className="space-y-2 w-full">
                 <span className="bg-black text-white px-3 py-1 font-mono text-sm font-bold uppercase rounded-full">
                   Right Now
                 </span>
-                <h1 className="text-5xl md:text-6xl font-black uppercase leading-[0.9] break-words max-w-full">
+                <h1 className="text-5xl md:text-6xl font-black uppercase leading-[0.9] break-words">
                   {currentTask.title}
                 </h1>
               </div>
@@ -129,9 +129,9 @@ export const FocusView: React.FC<FocusViewProps> = ({ tasks, onFinishDay, onEdit
               <h2 className="text-3xl font-black uppercase">Nothing Scheduled</h2>
               
               {nextTask ? (
-                <div className="bg-neo-yellow text-neo-black border-2 border-neo-black p-4 shadow-neo-sm mt-4">
+                <div className="bg-neo-yellow text-neo-black border-2 border-neo-black p-4 shadow-neo-sm mt-4 w-full">
                   <p className="text-xs font-bold uppercase mb-1">Up Next in {getDurationString(getTimeUntilNext() || 0)}</p>
-                  <p className="text-xl font-black uppercase">{nextTask.title}</p>
+                  <p className="text-xl font-black uppercase leading-tight">{nextTask.title}</p>
                   <p className="text-sm font-mono font-bold">{nextTask.startTime}</p>
                 </div>
               ) : (
@@ -150,8 +150,8 @@ export const FocusView: React.FC<FocusViewProps> = ({ tasks, onFinishDay, onEdit
       </div>
 
       {/* Decorative Background Elements */}
-      <div className="absolute top-10 left-10 w-32 h-32 bg-neo-green rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-      <div className="absolute bottom-10 right-10 w-40 h-40 bg-neo-purple rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000"></div>
+      <div className="absolute top-10 left-10 w-32 h-32 bg-neo-green rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse pointer-events-none"></div>
+      <div className="absolute bottom-10 right-10 w-40 h-40 bg-neo-purple rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000 pointer-events-none"></div>
     </div>
   );
 };

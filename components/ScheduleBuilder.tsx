@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Task } from '../types';
 import { NeoButton, NeoCard, NeoInput, NeoToast } from './NeoComponents';
 import { generateId, formatTimeDisplay, getMinutesFromMidnight, hasTimeOverlap, playErrorSound } from '../utils';
@@ -16,17 +16,6 @@ export const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({ tasks, setTask
   const [endTime, setEndTime] = useState('');
   const [toast, setToast] = useState<{message: string, type: 'success' | 'error' | 'info'} | null>(null);
   const [isResetConfirming, setIsResetConfirming] = useState(false);
-
-  // Sort tasks automatically whenever they change
-  useEffect(() => {
-    const sorted = [...tasks].sort((a, b) => 
-      getMinutesFromMidnight(a.startTime) - getMinutesFromMidnight(b.startTime)
-    );
-    // Only update if order is different to avoid infinite loop
-    if (JSON.stringify(sorted) !== JSON.stringify(tasks)) {
-      setTasks(sorted);
-    }
-  }, [tasks, setTasks]);
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
@@ -71,7 +60,12 @@ export const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({ tasks, setTask
       completed: false,
     };
 
-    setTasks([...tasks, newTask]);
+    // Add and Sort immediately
+    const newTasks = [...tasks, newTask].sort((a, b) => 
+      getMinutesFromMidnight(a.startTime) - getMinutesFromMidnight(b.startTime)
+    );
+
+    setTasks(newTasks);
     setNewTaskTitle('');
     setStartTime(endTime); // UX: Set next start time to previous end time
     setEndTime('');
@@ -95,7 +89,7 @@ export const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({ tasks, setTask
   };
 
   return (
-    <div className="max-w-3xl mx-auto w-full flex flex-col gap-6 pb-20 relative">
+    <div className="max-w-3xl mx-auto w-full flex flex-col gap-6 pb-24 relative pt-4">
       {toast && <NeoToast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
 
       <div className="text-center space-y-2">
@@ -171,7 +165,7 @@ export const ScheduleBuilder: React.FC<ScheduleBuilderProps> = ({ tasks, setTask
       </div>
 
       {/* Actions */}
-      <div className="fixed bottom-0 left-0 w-full p-4 bg-neo-white/90 backdrop-blur-sm border-t-2 border-neo-black flex items-center justify-between gap-4 z-40">
+      <div className="fixed bottom-0 left-0 w-full p-4 bg-neo-white/95 backdrop-blur-sm border-t-2 border-neo-black flex items-center justify-between gap-4 z-40 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <button 
           onClick={handleClearAll} 
           className={`p-3 font-bold hover:underline flex items-center gap-2 transition-colors ${isResetConfirming ? 'text-red-600 bg-red-100 border-2 border-red-600' : 'text-red-500'}`}

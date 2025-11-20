@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Brutally Productive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -37,9 +37,15 @@
           -ms-overflow-style: none;  /* IE and Edge */
           scrollbar-width: none;  /* Firefox */
       }
-      body {
+      html, body {
+        height: 100%;
         background-color: #fdfbf7;
         color: #1a1a1a;
+        overscroll-behavior-y: none; /* Prevents bounce effect on mobile */
+      }
+      #root {
+        height: 100%;
+        isolation: isolate;
       }
     </style>
   <script type="importmap">

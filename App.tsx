@@ -9,44 +9,57 @@ const App: React.FC = () => {
   const [view, setView] = useState<AppView>('builder');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [logs, setLogs] = useState<DailyLog[]>([]);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from local storage on mount
   useEffect(() => {
     const savedTasks = localStorage.getItem('bp_tasks');
     const savedDate = localStorage.getItem('bp_date');
     const savedLogs = localStorage.getItem('bp_logs');
+    const savedView = localStorage.getItem('bp_view') as AppView | null;
 
     if (savedLogs) {
       setLogs(JSON.parse(savedLogs));
     }
 
-    // If date is different from today, clear tasks for a fresh start
     const today = getTodayString();
+
+    // Check if it's a new day
     if (savedDate !== today) {
       localStorage.setItem('bp_date', today);
       setTasks([]);
-      // Stay on builder view
-    } else if (savedTasks) {
-      const parsedTasks = JSON.parse(savedTasks);
-      setTasks(parsedTasks);
-      // If we have tasks, assume the user might want to resume, 
-      // but standard flow is to build first. Let's keep them on builder 
-      // unless they actively switched, but for simplicity, default to builder.
-      // However, if tasks exist, we enable the "Start" button.
+      changeView('builder'); // Reset to builder on new day
+    } else {
+      // Same day: restore state
+      if (savedTasks) {
+        setTasks(JSON.parse(savedTasks));
+      }
+      if (savedView) {
+        setView(savedView);
+      }
     }
+    setIsLoaded(true);
   }, []);
+
+  // Helper to update view and persist it
+  const changeView = (newView: AppView) => {
+    setView(newView);
+    localStorage.setItem('bp_view', newView);
+  };
 
   // Save tasks whenever they change
   useEffect(() => {
-    localStorage.setItem('bp_tasks', JSON.stringify(tasks));
-  }, [tasks]);
+    if (isLoaded) {
+      localStorage.setItem('bp_tasks', JSON.stringify(tasks));
+    }
+  }, [tasks, isLoaded]);
 
   const handleStartDay = () => {
-    setView('focus');
+    changeView('focus');
   };
 
   const handleFinishDay = () => {
-    setView('review');
+    changeView('review');
   };
 
   const handleSaveRating = (rating: number) => {
@@ -59,16 +72,17 @@ const App: React.FC = () => {
     setLogs(updatedLogs);
     localStorage.setItem('bp_logs', JSON.stringify(updatedLogs));
     
-    alert(`Rating of ${rating}/10 saved! See you tomorrow.`);
     // Reset for "tomorrow" or just clear tasks to simulate end of day
     setTasks([]);
-    setView('builder');
+    changeView('builder');
   };
+
+  if (!isLoaded) return null; // Prevent flash of wrong content
 
   return (
     <div className="min-h-screen bg-neo-white font-sans text-neo-black overflow-x-hidden">
       {view === 'builder' && (
-        <div className="p-6">
+        <div className="p-6 min-h-screen pb-[env(safe-area-inset-bottom)]">
            <ScheduleBuilder 
             tasks={tasks} 
             setTasks={setTasks} 
@@ -77,7 +91,7 @@ const App: React.FC = () => {
           
           {/* Simple History Section at bottom of builder */}
           {logs.length > 0 && (
-             <div className="max-w-3xl mx-auto mt-10 border-t-4 border-neo-black pt-10 opacity-50 hover:opacity-100 transition-opacity">
+             <div className="max-w-3xl mx-auto mt-10 border-t-4 border-neo-black pt-10 opacity-50 hover:opacity-100 transition-opacity mb-20">
                <h3 className="font-black uppercase text-lg mb-4">Performance History</h3>
                <div className="flex gap-2 overflow-x-auto no-scrollbar pb-4">
                  {logs.slice().reverse().map((log, i) => (
@@ -96,14 +110,14 @@ const App: React.FC = () => {
         <FocusView 
           tasks={tasks} 
           onFinishDay={handleFinishDay}
-          onEditSchedule={() => setView('builder')}
+          onEditSchedule={() => changeView('builder')}
         />
       )}
 
       {view === 'review' && (
         <DailyReview 
           onSave={handleSaveRating} 
-          onCancel={() => setView('focus')} 
+          onCancel={() => changeView('focus')} 
         />
       )}
     </div>
