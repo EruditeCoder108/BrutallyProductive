@@ -149,9 +149,9 @@ export const FocusView: React.FC<FocusViewProps> = ({ tasks, onFinishDay, onEdit
         </NeoButton>
       </div>
 
-      {/* Decorative Background Elements */}
-      <div className="absolute top-10 left-10 w-32 h-32 bg-neo-green rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse pointer-events-none"></div>
-      <div className="absolute bottom-10 right-10 w-40 h-40 bg-neo-purple rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse animation-delay-2000 pointer-events-none"></div>
+      {/* Decorative Background Elements - Static for better mobile performance */}
+      <div className="absolute top-10 left-10 w-32 h-32 bg-neo-green rounded-full mix-blend-multiply filter blur-xl opacity-30 pointer-events-none transform translate-x-[-20%] translate-y-[-20%]"></div>
+      <div className="absolute bottom-10 right-10 w-40 h-40 bg-neo-purple rounded-full mix-blend-multiply filter blur-xl opacity-30 pointer-events-none transform translate-x-[20%] translate-y-[20%]"></div>
     </div>
   );
 };

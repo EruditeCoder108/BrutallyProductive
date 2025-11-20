@@ -11,6 +11,12 @@ const App: React.FC = () => {
   const [logs, setLogs] = useState<DailyLog[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Helper to update view and persist it
+  const changeView = (newView: AppView) => {
+    setView(newView);
+    localStorage.setItem('bp_view', newView);
+  };
+
   // Load data from local storage on mount
   useEffect(() => {
     const savedTasks = localStorage.getItem('bp_tasks');
@@ -23,29 +29,33 @@ const App: React.FC = () => {
     }
 
     const today = getTodayString();
+    let currentTasks: Task[] = [];
 
     // Check if it's a new day
     if (savedDate !== today) {
+      // New Day: Reset everything
+      console.log('New day detected. Resetting...');
       localStorage.setItem('bp_date', today);
+      localStorage.setItem('bp_view', 'builder');
       setTasks([]);
-      changeView('builder'); // Reset to builder on new day
+      setView('builder');
     } else {
-      // Same day: restore state
+      // Same Day: Restore State
       if (savedTasks) {
-        setTasks(JSON.parse(savedTasks));
+        currentTasks = JSON.parse(savedTasks);
+        setTasks(currentTasks);
       }
-      if (savedView) {
+      
+      // Only restore "focus" or "review" if we actually have tasks
+      if (savedView && savedView !== 'builder' && currentTasks.length > 0) {
         setView(savedView);
+      } else {
+        // Fallback to builder if tasks are empty but view was stuck on focus
+        setView('builder');
       }
     }
     setIsLoaded(true);
   }, []);
-
-  // Helper to update view and persist it
-  const changeView = (newView: AppView) => {
-    setView(newView);
-    localStorage.setItem('bp_view', newView);
-  };
 
   // Save tasks whenever they change
   useEffect(() => {
@@ -80,9 +90,9 @@ const App: React.FC = () => {
   if (!isLoaded) return null; // Prevent flash of wrong content
 
   return (
-    <div className="min-h-screen bg-neo-white font-sans text-neo-black overflow-x-hidden">
+    <div className="min-h-[100dvh] bg-neo-white font-sans text-neo-black overflow-x-hidden">
       {view === 'builder' && (
-        <div className="p-6 min-h-screen pb-[env(safe-area-inset-bottom)]">
+        <div className="p-6 min-h-[100dvh] pb-[max(6rem,env(safe-area-inset-bottom))]">
            <ScheduleBuilder 
             tasks={tasks} 
             setTasks={setTasks} 
